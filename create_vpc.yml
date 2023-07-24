@@ -8,8 +8,8 @@
   tasks:
   - name: Query vpc
     amazon.aws.ec2_vpc_net_info:
-      aws_access_key: "{{ access_key }}"
-      aws_secret_access_key: "{{ aws_secret_access_key }}"
+      # aws_access_key: "{{ access_key }}"
+      # aws_secret_access_key: "{{ aws_secret_access_key }}"
       filters:
         "tag:Name": "{{ VPC }}"
     register: existing_vpc
@@ -31,8 +31,8 @@
   - name: Create vpc
     amazon.aws.ec2_vpc_net:
       name: "{{ VPC }}"
-      aws_access_key: "{{ access_key }}"
-      aws_secret_access_key: "{{ aws_secret_access_key }}"
+      # aws_access_key: "{{ access_key }}"
+      # aws_secret_access_key: "{{ aws_secret_access_key }}"
       cidr_block: "{{ CIDR }}"
       region: "{{ aws_region }}"
       tenancy: default
@@ -48,8 +48,8 @@
 
   - name: Query Subnet
     amazon.aws.ec2_vpc_subnet_info:
-      aws_access_key: "{{ access_key }}"
-      aws_secret_access_key: "{{ aws_secret_access_key }}"
+      # aws_access_key: "{{ access_key }}"
+      # aws_secret_access_key: "{{ aws_secret_access_key }}"
       filters:
         vpc-id: "{{ vpc_id }}"
     register: vpc_subnet
@@ -65,8 +65,8 @@
 
   - name: Create subnet for the VPC
     amazon.aws.ec2_vpc_subnet:
-      aws_access_key: "{{ access_key }}"
-      aws_secret_access_key: "{{ aws_secret_access_key }}"
+      # aws_access_key: "{{ access_key }}"
+      # aws_secret_access_key: "{{ aws_secret_access_key }}"
       state: present
       vpc_id: "{{ vpc_id }}"
       cidr: "{{ CIDR }}"
@@ -85,8 +85,8 @@
 
   - name: Query internet gateway
     amazon.aws.ec2_vpc_igw_info:
-      aws_access_key: "{{ access_key }}"
-      aws_secret_access_key: "{{ aws_secret_access_key }}"
+      # aws_access_key: "{{ access_key }}"
+      # aws_secret_access_key: "{{ aws_secret_access_key }}"
       filters:
         "tag:Name": "{{ InternetGateway }}"
     register: existing_igw
@@ -107,8 +107,8 @@
 
   - name: Create internet gateway
     amazon.aws.ec2_vpc_igw:
-      aws_access_key: "{{ access_key }}"
-      aws_secret_access_key: "{{ aws_secret_access_key }}"
+      # aws_access_key: "{{ access_key }}"
+      # aws_secret_access_key: "{{ aws_secret_access_key }}"
       vpc_id: "{{ vpc_id }}"
       state: present
       tags:
@@ -139,8 +139,8 @@
 
   - name: Gather information about any VPC route table within VPC with ID {{ vpc_id }}
     amazon.aws.ec2_vpc_route_table_info:
-      aws_access_key: "{{ access_key }}"
-      aws_secret_access_key: "{{ aws_secret_access_key }}"
+      # aws_access_key: "{{ access_key }}"
+      # aws_secret_access_key: "{{ aws_secret_access_key }}"
       filters:
         vpc-id: "{{ vpc_id }}"
     register: vpc_route_table
@@ -161,8 +161,8 @@
 
   - name: Set up public subnet route table
     amazon.aws.ec2_vpc_route_table:
-      aws_access_key: "{{ access_key }}"
-      aws_secret_access_key: "{{ aws_secret_access_key }}"
+      # aws_access_key: "{{ access_key }}"
+      # aws_secret_access_key: "{{ aws_secret_access_key }}"
       vpc_id: "{{ vpc_id }}"
       region: "{{ aws_region }}"
       lookup: "id"
