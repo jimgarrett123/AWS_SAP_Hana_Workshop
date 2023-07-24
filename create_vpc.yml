@@ -69,6 +69,7 @@
     amazon.aws.ec2_vpc_subnet:
       # aws_access_key: "{{ access_key }}"
       # aws_secret_access_key: "{{ aws_secret_access_key }}"
+      region: "{{ aws_region }}"
       state: present
       vpc_id: "{{ vpc_id }}"
       cidr: "{{ CIDR }}"
