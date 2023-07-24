@@ -1,0 +1,71 @@
+---
+- name: Create Virtual Private Network on AWS
+  hosts: aws_servers
+  become: true
+
+  vars_files:
+    - external_vars.yml
+
+  tasks:
+  - name: Query machine
+    amazon.aws.ec2_instance_info:
+      aws_access_key: "{{ access_key }}"
+      aws_secret_access_key: "{{ aws_secret_access_key }}"
+      filters:
+        dns-name: "{{ inventory_hostname }}"
+        # "tag:Name": "{{ vm_name }}"
+        instance-state-name:
+          - running
+      region: "{{ aws_region }}"
+    register: existing_vm
+    tags: query
+
+  - name: Output the IP of existing VM
+    ansible.builtin.debug:
+      msg:
+        - "VM Info: {{ existing_vm.instances[0].tags.Name }}"
+        - "VM Info: {{ existing_vm.instances[0].tags.Hostname }}"
+        - "VM Info: {{ existing_vm.instances[0].private_ip_address }}"
+    when: existing_vm.instances is defined and existing_vm.instances | length > 0
+    tags: query
+
+  - name: Set variables
+    ansible.builtin.set_fact:
+      data:
+        priv_network_private_ip: "{{ existing_vm.instances[0].private_ip_address }}"
+        tag_hostname: "{{ existing_vm.instances[0].tags.Hostname }}"
+    when: existing_vm.instances is defined and existing_vm.instances | length > 0
+    tags: set
+
+  - name: Output Information
+    ansible.builtin.debug:
+      msg:
+        - "{{ existing_vm.instances[0].tags.Hostname }}"
+        - "{{ existing_vm.instances[0].private_ip_address }}"
+    when: existing_vm.instances is defined and existing_vm.instances | length > 0
+    tags: output
+
+  - name: Output Information
+    ansible.builtin.debug:
+      msg:
+        - "{{ az_list }}"
+    tags: output
+
+  - name: Append text to file
+    ansible.builtin.lineinfile:
+      create: true
+      state: present
+      path: ./subnet_info.txt
+      line: "{{ existing_vm.instances[0].private_ip_address }}\t{{ existing_vm.instances[0].tags.Hostname }}"
+    when: existing_vm.instances is defined and existing_vm.instances | length > 0
+    tags: outfile
+
+  - name: Set Hostname to "{{ existing_vm.instances[0].tags.Hostname }}"
+    ansible.builtin.script:
+      cmd: "/usr/bin/hostnamectl set-hostname {{ existing_vm.instances[0].tags.Hostname }}"
+    tags: mod_hostname
+
+  - name: Modify hosts file to include new host
+    ansible.builtin.script:
+      cmd: "/usr/bin/echo -e '{{ existing_vm.instances[0].private_ip_address }}\t{{ existing_vm.instances[0].tags.Hostname }}' >> /etc/hosts"
+    tags: mod_hostname

@@ -1,0 +1,5 @@
+---
+- name: Subscribe
+  import_playbook: test1.yml
+- name: Subscribe
+  import_playbook: test2.yml

@@ -1,0 +1,34 @@
+---
+- name: Create ssh keys between machines
+  hosts: aws_servers
+  become: true
+
+  tasks:
+  - name: Run ssh keypair
+    community.crypto.openssh_keypair:
+      path: /root/.ssh/id_rsa
+      type: rsa
+      size: 4096
+      state: present
+      force: false
+    tags: ssh
+
+  - name: fetch all public ssh keys
+    shell: cat /root/.ssh/id_rsa.pub
+    register: ssh_keys
+    tags:
+      - ssh
+
+  - name: check keys
+    debug: msg="{{ ssh_keys.stdout }}"
+    tags:
+      - ssh
+
+  - name: deploy keys on all servers
+    authorized_key: user=root key="{{ item[0] }}"
+    delegate_to: "{{ item[1] }}"
+    with_nested:
+      - "{{ ssh_keys.stdout }}"
+      - "{{groups['aws_servers']}}"
+    tags:
+      - ssh

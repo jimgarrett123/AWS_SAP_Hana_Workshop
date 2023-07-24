@@ -1,0 +1,12 @@
+---
+- name: Subscribe
+  import_playbook: subscribe.yml
+- name: Subscribe
+  import_playbook: subscribe.yml
+- name: SSHKeys
+  import_playbook: sshkeys_copy.yml
+- name: SAP Hana Preconfig
+  import_playbook: sap-hana-preconfig.yml
+  ignore_errors: true
+- name: Disable Firewall and disable_firewall_selinux.yml
+  import_playbook: disable_firewall_selinux.yml

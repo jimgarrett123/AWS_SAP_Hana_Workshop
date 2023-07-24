@@ -1,0 +1,41 @@
+---
+- name: Copy SAP Hana files
+  hosts: aws_servers,SAPSoftware
+  become: true
+
+  tasks:
+  - name: Create a directory if it does not exist
+    ansible.builtin.file:
+      path: /hana/sw
+      state: directory
+      mode: '0777'
+    tags: directory
+  
+  - name: Copy ssh file
+    ansible.builtin.copy:
+      src: ./keyVM.pem
+      dest: /root/.ssh/keyVM.pem
+      mode: 0400
+    tags: copy_pem
+
+  - name: Copy ssh file
+    ansible.builtin.copy:
+      src: ./SAPKey.pem
+      dest: /root/.ssh/SAPKey.pem
+      mode: 0400
+    tags: copy_pem
+
+  - name: Copy the file from SAP Server to Inventory using Method Pull
+    ansible.posix.synchronize:
+      src: "{{ item }}"
+      dest: "{{ item }}"
+      mode: push
+      private_key: /root/.ssh/SAPKey.pem
+    delegate_to: "{{groups['SAPSoftware'][0]}}"
+    register: syncfile
+#    run_once: true
+    with_items:
+      - "/hana/sw/SAPHOSTAGENT101_101-20005731.SAR"
+      - "/hana/sw/IMDB_SERVER20_059_8-80002031.SAR"
+      - "/hana/sw/SAPCAR_1324-80000935.EXE"
+    tags: sync-pull

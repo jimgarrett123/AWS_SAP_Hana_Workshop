@@ -1,0 +1,12 @@
+[VMHana1]
+ec2-3-145-161-138.us-east-2.compute.amazonaws.com ansible_ssh_private_key_file=SAPKey.pem ansible_user=ec2-user
+
+[VMHana2]
+ec2-3-129-24-5.us-east-2.compute.amazonaws.com ansible_ssh_private_key_file=SAPKey.pem ansible_user=ec2-user
+
+[SAPSoftware]
+ec2-18-221-0-189.us-east-2.compute.amazonaws.com ansible_ssh_private_key_file=SAPKey.pem ansible_user=ec2-user
+
+[aws_servers:children]
+VMHana1
+VMHana2

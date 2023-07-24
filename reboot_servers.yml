@@ -1,0 +1,12 @@
+---
+- name: Reboot servers
+  hosts: aws_servers
+  become: true
+
+  tasks:
+  - name: Reboot server
+    ansible.builtin.reboot:
+      msg: System reboot inititated by Ansible
+      reboot_command: shutdown --reboot
+      connect_timeout: 5
+      reboot_timeout: 5

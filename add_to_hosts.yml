@@ -1,0 +1,12 @@
+---
+- name: Add node and ip address to hosts file
+  hosts: aws_servers
+  become: true
+
+  vars_files:
+    - external_vars.yml
+
+  - name: Modify hosts file to include new host
+    ansible.builtin.script:
+      cmd: "/usr/bin/echo -e '{{ private_ip_address }}\t{{ hostname }}' >> /etc/hosts"
+

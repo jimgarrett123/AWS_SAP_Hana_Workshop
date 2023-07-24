@@ -1,0 +1,7 @@
+---
+- name: Copy Hana Files
+  import_playbook: copy_hana_files.yml
+- name: SAP Hana Install
+  import_playbook: sap-hana-install.yml
+- name: SAP Hana HSR
+  import_playbook: sap-hana-hsr.yml

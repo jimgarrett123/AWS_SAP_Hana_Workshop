@@ -1,0 +1,26 @@
+---
+- name: Query VM
+  hosts: aws_servers
+
+  vars_files:
+    - external_vars.yml
+
+  tasks:
+    - name: Check if the VM is already provisioned
+      amazon.aws.ec2_instance_info:
+        aws_access_key: "{{ access_key }}"
+        aws_secret_access_key: "{{ aws_secret_access_key }}"
+        filters:
+          dns-name: "{{ inventory_hostname }}"
+          # "tag:Name": "{{ vm_name }}"
+          instance-state-name:
+            - running
+        region: "{{ aws_region }}"
+      register: existing_vm
+
+    - name: Output the IP of existing VM
+      ansible.builtin.debug:
+        msg:
+          - "VM Info: {{ existing_vm.instances[0].tags.Name }}"
+          - "VM Info: {{ existing_vm.instances[0].tags.Hostname }}"
+      when: existing_vm.instances is defined and existing_vm.instances | length > 0

@@ -1,0 +1,73 @@
+---
+- name: Subscription Manager Actions
+  hosts: aws_servers
+
+  tasks:
+  - name: Run command line script
+    ansible.builtin.script:
+      cmd: "/usr/bin/echo -e '{{ root_password }}\n{{ root_password }}\n{{ root_password }}' | sudo passwd"
+    tags: passwd
+
+  - name: Subscription-manager register
+    community.general.redhat_subscription:
+      state: present
+      username: "{{ username }}"
+      password: "{{ password }}"
+      pool: ^(Employee SKU)$
+      force_register: true
+    become: true
+    tags: subscribe
+
+  - name: Subscription-manager release
+    rhsm_release:
+      release: "8.6"
+    become: true
+    tags: release
+
+  - name: Config rhsm.manage_repos=1
+    shell: subscription-manager config --rhsm.manage_repos=1
+    become: true
+    tags: rhsm_manage
+
+  - name: Subscription-manager repos
+    community.general.rhsm_repository:
+      name:
+        - rhel-8-for-x86_64-baseos-e4s-rpms
+        - rhel-8-for-x86_64-appstream-e4s-rpms
+        - rhel-8-for-x86_64-sap-solutions-e4s-rpms
+        - rhel-8-for-x86_64-sap-netweaver-e4s-rpms
+      state: enabled
+    become: true
+    tags: repos
+
+  - name: DNF install ansible
+    ansible.builtin.package:
+      name:
+        - ansible
+        - rhel-system-roles-sap
+      state: present
+    become: true
+    tags: ansible
+
+  - name: Install Pip
+    ansible.builtin.pip:
+      name: pip
+    become: true
+    tags: boto
+
+  - name: Install Pip Botocore
+    ansible.builtin.pip:
+      name: botocore
+    become: true
+    tags: boto
+
+  - name: Install Pip Boto3
+    ansible.builtin.pip:
+      name: boto3
+    become: true
+    tags: boto
+
+  - name: Install Ansible Collection
+    ansible.builtin.command: ansible-galaxy collection install amazon.aws
+    become: true
+    tags: amazon_collection

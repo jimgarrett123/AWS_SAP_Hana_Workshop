@@ -1,0 +1,29 @@
+primary_vm: VMHana3
+secondary_vm: VMHana4
+
+VPC: "TestVPC"
+InternetGateway: "VM-internet-gateway"
+Subnet: "{{ VPC }} - Subnet"
+CIDR: "10.0.0.0/24"
+aws_region: us-east-2
+aws_keypair_name: SAPKey
+aws_instance_size: t2.2xlarge
+tenancy: default
+aws_securitygroup_name: private-network-sg
+aws_vpc_subnet_name: priv-net-private-subnet
+aws_ec2_wait: true
+aws_userdata_template: default
+# Tag Defaults
+hostname: tbd
+vm_name: VMHana3
+vm_deployment: default
+vm_environment: default
+vm_owner: ansible
+vm_purpose: demo
+# AMI Lookup
+aws_image_filter: "RHEL-8.6.0_HVM-20230411-x86_64-60-Access2-GP2"
+aws_image_architecture: x86_64
+# SAPKey File
+sap_key_file: SAPKey.pem
+sap_domain: "example.com"
+

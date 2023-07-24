@@ -1,0 +1,8 @@
+---
+- name: SAP Hana Pre-config [VMHana1]
+  hosts: aws_servers
+  become: true
+
+  roles:
+    - sap_general_preconfigure
+    - sap_hana_preconfigure

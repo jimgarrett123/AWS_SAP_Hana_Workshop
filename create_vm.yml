@@ -1,0 +1,156 @@
+---
+- name: Create Virtual Private Network on AWS
+  hosts: localhost
+    
+  vars_files:
+    - external_vars.yml
+
+  tasks:
+  - name: Check if the VM is already provisioned
+    amazon.aws.ec2_instance_info:
+      aws_access_key: "{{ access_key }}"
+      aws_secret_access_key: "{{ aws_secret_access_key }}"
+      filters:
+        "tag:Name": "{{ vm_name }}"
+        instance-state-name:
+          - pending
+          - running
+          - shutting-down
+          - stopping
+          - stopped
+      region: "{{ aws_region }}"
+    register: existing_vm
+
+  - name: Output the IP of existing VM
+    ansible.builtin.debug:
+      msg:
+        - "Public IP for new instance: {{ existing_vm.instances[0].public_ip_address }}"
+        - "Private IP for new instance: {{ existing_vm.instances[0].private_ip_address }}"
+    when: existing_vm.instances is defined and existing_vm.instances | length > 0
+
+  - name: Set stats for Controller of existing VM
+    ansible.builtin.set_stats:
+      data:
+        priv_network_private_ip: "{{ existing_vm.instances[0].private_ip_address }}"
+        public_ip: "{{ existing_vm.instances[0].public_ip_address }}"
+    when: existing_vm.instances is defined and existing_vm.instances | length > 0
+
+  - name: Create Instance
+    when: existing_vm.instances | length == 0
+    block:
+      - name: query vpc
+        amazon.aws.ec2_vpc_net_info:
+          aws_access_key: "{{ access_key }}"
+          aws_secret_access_key: "{{ aws_secret_access_key }}"
+          filters:
+            "tag:Name": "{{ VPC }}"
+        register: existing_vpc
+        tags: vpc, igw
+
+      - name:  VPC
+        ansible.builtin.debug:
+          msg:
+            - "existing_vpc : {{ existing_vpc }}"
+        when: existing_vpc is defined and existing_vpc.vpcs | length > 0
+        tags: vpc
+
+      - name: set vpc_id when it already exists
+        set_fact:
+          vpc_id: "{{ existing_vpc.vpcs[0].vpc_id }}"
+        when: existing_vpc is defined and existing_vpc.vpcs | length > 0
+        tags: vpc
+
+      - name: Get Security Group Info
+        amazon.aws.ec2_security_group_info:
+          aws_access_key: "{{ access_key }}"
+          aws_secret_access_key: "{{ aws_secret_access_key }}"
+          filters:
+            vpc-id: "{{ vpc_id }}"
+        register: aws_security_group
+        when: vpc_id is defined
+
+      - name: Save Security Group id
+        ansible.builtin.set_fact:
+          security_group_id: "{{ aws_security_group.security_groups[0].group_id }}"
+        when: aws_security_group is defined and aws_security_group.security_groups | length > 0
+
+      - name:  Security Group ID
+        ansible.builtin.debug:
+          msg:
+            - "security_group_id : {{ security_group_id }}"
+        when: security_group_id is defined
+
+      - name: Get subnet info
+        amazon.aws.ec2_vpc_subnet_info:
+          aws_access_key: "{{ access_key }}"
+          aws_secret_access_key: "{{ aws_secret_access_key }}"
+          region: "{{ aws_region }}"
+          filters:
+            "tag:Name": "{{ Subnet }}"
+        register: aws_subnet
+        when: aws_subnet_id is not defined
+
+      - name: Save subnet id
+        ansible.builtin.set_fact:
+          aws_subnet_id: "{{ aws_subnet.subnets | map(attribute='id') | list | last }}"
+        when: aws_subnet_id is not defined
+
+      - name: Find ami
+        amazon.aws.ec2_ami_info:
+          aws_access_key: "{{ access_key }}"
+          aws_secret_access_key: "{{ aws_secret_access_key }}"
+          region: "{{ aws_region }}"
+          owners: "{{ aws_image_owners | default(omit) }}"
+          filters:
+            name: "{{ aws_image_filter }}"
+        register: vm_amis
+        when: aws_instance_ami is not defined
+
+      - name: Save ami
+        ansible.builtin.set_fact:
+          aws_instance_ami: >
+            {{ (vm_amis.images | selectattr('name', 'defined') | sort(attribute='creation_date'))[-1].image_id }}
+        when: aws_instance_ami is not defined
+
+      - name: Create instance
+        amazon.aws.ec2_instance:
+          aws_access_key: "{{ access_key }}"
+          aws_secret_access_key: "{{ aws_secret_access_key }}"
+          vpc_subnet_id: "{{ aws_subnet_id }}"
+          filters:
+            "tag:Name": "{{ vm_name }}"
+          network:
+            assign_public_ip: true
+            delete_on_termination: true
+            subnet_id: "{{ aws_subnet_id }}"
+          tenancy: "{{ tenancy }}"
+          key_name: "{{ aws_keypair_name }}"
+          instance_type: "{{ aws_instance_size }}"
+          image_id: "{{ aws_instance_ami | trim }}"
+          region: "{{ aws_region }}"
+          security_group: "{{ security_group_id }}"
+          volumes:
+            - device_name: /dev/sda1
+              ebs:
+                volume_size: 100
+                delete_on_termination: true
+          tags:
+            Name: "{{ vm_name }}"
+            Hostname: "{{ hostname }}"
+          wait: "{{ aws_ec2_wait }}"
+          vpc_subnet_id: "{{ aws_subnet_id }}"
+        register: aws_ec2_instance
+
+      - name: Output the IP of new VM
+        ansible.builtin.debug:
+          msg:
+            - "Public IP for new instance: {{ aws_ec2_instance.instances[0].public_ip_address | default('') }}"
+            - "Private IP for new instance: {{ aws_ec2_instance.instances[0].private_ip_address | default('') }}"
+        when: aws_ec2_instance.instances is defined and aws_ec2_instance.instances | length > 0
+
+      - name: Set stats for Controller of new VM
+        ansible.builtin.set_stats:
+          data:
+            priv_network_private_ip: "{{ aws_ec2_instance.instances[0].private_ip_address | default('') }}"
+            public_ip: "{{ aws_ec2_instance.instances[0].public_ip_address | default('') }}"
+        when: aws_ec2_instance.instances is defined and aws_ec2_instance.instances | length > 0

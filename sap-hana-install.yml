@@ -1,0 +1,11 @@
+---
+- name: Copy SAP Hana files
+  hosts: aws_servers
+  become: true
+  vars:
+    sap_hana_install_software_directory: /hana/sw
+    sap_hana_install_common_master_password: 'Redhat7!'
+    sap_hana_install_sid: 'TST'
+    sap_hana_install_instance_number: '00'
+  roles:
+    - sap_hana_install

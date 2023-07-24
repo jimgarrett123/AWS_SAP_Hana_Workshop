@@ -1,0 +1,43 @@
+---
+- name: Disable Firewalld and selinux
+  hosts: aws_servers
+  become: true
+
+  tasks:
+  - name: Install libatomic libtool0ltdl
+    ansible.builtin.package:
+      name:
+        - libatomic
+        - libtool-ltdl
+      state: latest
+    tags: libatomic
+
+  - name: Stop and disable Firewalld
+    service:
+      name: firewalld
+      state: stopped
+      enabled: false
+    tags: disable_firewall
+
+  - name: Ensure SELinux is set to Permissive mode
+    ansible.builtin.lineinfile:
+      path: /etc/selinux/config
+      regexp: '^SELINUX='
+      line: SELINUX=permissive
+
+  #  - name: Set SELINIX=permissive1
+  #   ansible.builtin.script:
+  #     cmd: /usr/bin/sed -i 's/SELINUX=disabled/SELINUX=permissive/g' /etc/selinux/config
+  #   tags: permissive
+  # - name: Set SELINIX=permissive2
+  #   ansible.builtin.script:
+  #     cmd: /usr/bin/sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
+  #   tags: permissive
+
+  - name: Reboot server
+    ansible.builtin.reboot:
+      msg: System reboot inititated by Ansible
+      reboot_command: shutdown --reboot
+      connect_timeout: 5
+      reboot_timeout: 5
+    tags: reboot

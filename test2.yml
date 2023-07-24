@@ -1,0 +1,14 @@
+---
+- name: test2
+  hosts: localhost
+
+  vars_files: external_vars.yml
+
+  tasks:
+    - name: Debug parms
+      ansible.builtin.debug:
+        msg:
+          - node1 = {{ node1 }}
+          - node1_ip = {{ node1_ip }}
+          - node2 = {{ node2 }}
+          - node2_ip = {{ node2_ip }}

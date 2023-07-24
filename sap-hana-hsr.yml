@@ -1,0 +1,90 @@
+---
+- name: Configure SAP HANA System Replication
+  hosts: aws_servers
+  become: true
+  vars_files:
+    - external_vars.yml
+
+  tasks:
+    - name: Query Primary Node information
+      amazon.aws.ec2_instance_info:
+        aws_access_key: "{{ access_key }}"
+        aws_secret_access_key: "{{ aws_secret_access_key }}"
+        filters:
+          "tag:Name": "{{ primary_vm }}"
+          instance-state-name:
+            - running
+        region: "{{ aws_region }}"
+      register: primary_node
+      delegate_to: localhost
+      become: false
+      tags: query
+
+    - name: Debug PrimaryNode
+      ansible.builtin.debug:
+        msg:
+          - "primary_node : {{ primary_node }}"
+      when: primary_node is defined
+
+    - name: Query Seconday Node information
+      amazon.aws.ec2_instance_info:
+        aws_access_key: "{{ access_key }}"
+        aws_secret_access_key: "{{ aws_secret_access_key }}"
+        filters:
+          "tag:Name": "{{ secondary_vm }}"
+          instance-state-name:
+            - running
+        region: "{{ aws_region }}"
+      register: secondary_node
+      delegate_to: localhost
+      become: false
+      tags: query
+
+    - name: Set PrimaryNode IP Address
+      ansible.builtin.set_fact:
+        primary_node_ip_address: "{{ primary_node.instances[0].public_ip_address }}"
+        primary_node_dns_name: "{{ primary_node.instances[0].public_dns_name }}"
+      when: primary_node is defined and primary_node.instances | length > 0
+      delegate_to: localhost
+      become: false
+      tags: set
+
+    - name: Set Secondary IP Address
+      ansible.builtin.set_fact:
+        secondary_node_ip_address: "{{ secondary_node.instances[0].public_ip_address }}"
+        secondary_node_dns_name: "{{ secondary_node.instances[0].public_dns_name }}"
+      when: secondary_node is defined and secondary_node.instances | length > 0
+      delegate_to: localhost
+      become: false
+      tags: set
+
+
+    - name: Debug Primary Node Information
+      ansible.builtin.debug:
+        msg:
+          - "primary_node_ip_address : {{ primary_node_ip_address }}"
+          - "secondary_node_ip_address : {{ secondary_node_ip_address }}"
+          - "primary_node_dns_name : {{ primary_node_dns_name }}"
+          - "secondary_node_dns_name : {{ secondary_node_dns_name }}"
+      delegate_to: localhost
+      tags: debug
+
+    - name: Run Hana System Replication Role
+      vars:
+        sap_hana_sid: 'TST'
+        sap_hana_instance_number: '00'
+        sap_hana_install_master_password: 'Redhat7!'
+        sap_hana_cluster_nodes:
+          - node_name: "{{ primary_node_dns_name }}"
+            node_ip: "{{ primary_node_ip_address }}"
+            node_role: primary
+            hana_site: DC01
+          - node_name: "{{ secondary_node_dns_name }}"
+            node_ip: "{{ secondary_node_ip_address }}"
+            node_role: secondary
+            hana_site: DC02
+      become: true
+      block:
+      - name: Define Hana System Replication
+        ansible.builtin.include_role:
+          name: sap_ha_install_hana_hsr

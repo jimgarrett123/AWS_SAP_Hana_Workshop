@@ -1,0 +1,73 @@
+---
+- name: test1
+  hosts: localhost
+  vars_files: external_vars.yml
+
+  tasks:
+    - name: If node1 is defined already then update its value
+      when: node1 is defined
+      ansible.builtin.lineinfile:
+        path: external_vars.yml
+        regexp: '^node1:'
+        line: "node1: VMHanax"
+
+    - name: Else Append text to file
+      when: node1 is not defined
+      ansible.builtin.script:
+        cmd: "/usr/bin/echo -e 'node1: VMHanaX' >> external_vars.yml"
+
+    - name: If node1_ip is defined already then update its value
+      when: node1_ip is defined
+      ansible.builtin.lineinfile:
+        path: external_vars.yml
+        regexp: '^node1_ip:'
+        line: "node1_ip: 10.0.0.x"
+
+    - name: Else Append text to file
+      when: node1_ip is not defined
+      ansible.builtin.script:
+        cmd: "/usr/bin/echo -e 'node1_ip: 10.0.0.x' >> external_vars.yml"
+
+    - name: Set Node1 when not defined
+      when: node1 is not defined
+      ansible.builtin.set_fact:
+        node1: "VMHanaX"
+
+    - name: Set Node1_ip when not defined
+      when: node1_ip is not defined
+      ansible.builtin.set_fact:
+        node1_ip: "10.0.0.x"
+
+    - name: If node2 is defined already then update its value
+      when: node2 is defined
+      ansible.builtin.lineinfile:
+        path: external_vars.yml
+        regexp: '^node2:'
+        line: "node2: VMHanaY"
+
+    - name: Else Append text to file
+      when: node2 is not defined
+      ansible.builtin.script:
+        cmd: "/usr/bin/echo -e 'node2: VMHanaY' >> external_vars.yml"
+
+    - name: If node2_ip is defined already then update its value
+      when: node2_ip is defined
+      ansible.builtin.lineinfile:
+        path: external_vars.yml
+        regexp: '^node2_ip:'
+        line: "node2_ip: 10.0.0.x"
+
+    - name: Else Append text to file
+      when: node2_ip is not defined
+      ansible.builtin.script:
+        cmd: "/usr/bin/echo -e 'node2_ip: 10.0.0.x' >> external_vars.yml"
+
+    - name: Set Node2 when not defined
+      when: node2 is not defined
+      ansible.builtin.set_fact:
+        node2: "VMHanaY"
+
+    - name: Set Node2_ip when not defined
+      when: node2_ip is not defined
+      ansible.builtin.set_fact:
+        node2_ip: "10.0.0.y"
