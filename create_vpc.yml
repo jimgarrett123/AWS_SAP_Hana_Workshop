@@ -90,6 +90,7 @@
     amazon.aws.ec2_vpc_igw_info:
       # aws_access_key: "{{ access_key }}"
       # aws_secret_access_key: "{{ aws_secret_access_key }}"
+      region: "{{ aws_region }}"
       filters:
         "tag:Name": "{{ InternetGateway }}"
     register: existing_igw
@@ -112,6 +113,7 @@
     amazon.aws.ec2_vpc_igw:
       # aws_access_key: "{{ access_key }}"
       # aws_secret_access_key: "{{ aws_secret_access_key }}"
+      region: "{{ aws_region }}"
       vpc_id: "{{ vpc_id }}"
       state: present
       tags:
@@ -144,6 +146,7 @@
     amazon.aws.ec2_vpc_route_table_info:
       # aws_access_key: "{{ access_key }}"
       # aws_secret_access_key: "{{ aws_secret_access_key }}"
+      region: "{{ aws_region }}"
       filters:
         vpc-id: "{{ vpc_id }}"
     register: vpc_route_table
