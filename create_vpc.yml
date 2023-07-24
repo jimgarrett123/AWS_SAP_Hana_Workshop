@@ -1,12 +1,12 @@
 ---
 - name: Create Virtual Private Network on AWS
   hosts: localhost
-    
+
   vars_files:
     - external_vars.yml
 
   tasks:
-  - name: query vpc
+  - name: Query vpc
     amazon.aws.ec2_vpc_net_info:
       aws_access_key: "{{ access_key }}"
       aws_secret_access_key: "{{ aws_secret_access_key }}"
@@ -15,20 +15,20 @@
     register: existing_vpc
     tags: vpc, igw
 
-  - name:  VPC
+  - name: VPC
     ansible.builtin.debug:
       msg:
         - "existing_vpc : {{ existing_vpc }}"
     when: existing_vpc is defined and existing_vpc.vpcs | length > 0
     tags: vpc
 
-  - name: set vpc_id when it already exists
+  - name: Set vpc_id when it already exists
     set_fact:
       vpc_id: "{{ existing_vpc.vpcs[0].vpc_id }}"
     when: existing_vpc is defined and existing_vpc.vpcs | length > 0
     tags: vpc
 
-  - name: create vpc
+  - name: Create vpc
     amazon.aws.ec2_vpc_net:
       name: "{{ VPC }}"
       aws_access_key: "{{ access_key }}"
@@ -40,13 +40,13 @@
     when: vpc_id is not defined
     tags: vpc
 
-  - name: set vpcid after create new vpc
+  - name: Set vpcid after create new vpc
     set_fact:
       vpc_id: "{{ new_vpc.vpc.id }}"
     when: new_vpc is defined and vpc_id is not defined
     tags: vpc
 
-  - name: query Subnet
+  - name: Query Subnet
     amazon.aws.ec2_vpc_subnet_info:
       aws_access_key: "{{ access_key }}"
       aws_secret_access_key: "{{ aws_secret_access_key }}"
@@ -83,7 +83,7 @@
     when: vpc_subnet is defined
     tags: subnet
 
-  - name: query internet gateway
+  - name: Query internet gateway
     amazon.aws.ec2_vpc_igw_info:
       aws_access_key: "{{ access_key }}"
       aws_secret_access_key: "{{ aws_secret_access_key }}"
@@ -99,13 +99,13 @@
     when: existing_igw is defined
     tags: igw
 
-  - name: set igw_id after query
+  - name: Set igw_id after query
     set_fact:
       igw_id: "{{ existing_igw.internet_gateways[0].internet_gateway_id }}"
     when: existing_igw is defined and existing_igw.internet_gateways | length > 0
     tags: igw
 
-  - name: create internet gateway
+  - name: Create internet gateway
     amazon.aws.ec2_vpc_igw:
       aws_access_key: "{{ access_key }}"
       aws_secret_access_key: "{{ aws_secret_access_key }}"
@@ -124,13 +124,13 @@
     when: igw_id is not defined and new_igw is defined
     tags: igw
 
-  - name: set igw_id after create
+  - name: Set igw_id after create
     set_fact:
       igw_id: "{{ new_igw.gateway_id }}"
     when: igw_id is not defined and new_igw is defined
     tags: igw
 
-  - name:  Internet Gateway
+  - name: Internet Gateway
     ansible.builtin.debug:
       msg:
         - "igw_id : {{ igw_id }}"
@@ -146,7 +146,7 @@
     register: vpc_route_table
     tags: vpc
 
-  - name: set route_table_id after Get VPC Route Table
+  - name: Set route_table_id after Get VPC Route Table
     set_fact:
       route_table_id: "{{ vpc_route_table.route_tables[0].route_table_id }}"
     when: vpc_route_table is defined and vpc_route_table.route_tables | length > 0 
@@ -173,7 +173,7 @@
     register: public_route_table
     tags: public_route
 
-  - name:  Public Subnet Route Table
+  - name: Public Subnet Route Table
     ansible.builtin.debug:
       msg:
         - "public_route_table : {{ public_route_table }}"
