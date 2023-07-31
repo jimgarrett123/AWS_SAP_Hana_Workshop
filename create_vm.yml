@@ -38,7 +38,7 @@
   - name: Create Instance
     when: existing_vm.instances | length == 0
     block:
-      - name: query vpc
+      - name: Query vpc
         amazon.aws.ec2_vpc_net_info:
           # aws_access_key: "{{ access_key }}"
           # aws_secret_access_key: "{{ aws_secret_access_key }}"
@@ -47,14 +47,14 @@
         register: existing_vpc
         tags: vpc, igw
 
-      - name:  VPC
+      - name: VPC
         ansible.builtin.debug:
           msg:
             - "existing_vpc : {{ existing_vpc }}"
         when: existing_vpc is defined and existing_vpc.vpcs | length > 0
         tags: vpc
 
-      - name: set vpc_id when it already exists
+      - name: Set vpc_id when it already exists
         set_fact:
           vpc_id: "{{ existing_vpc.vpcs[0].vpc_id }}"
         when: existing_vpc is defined and existing_vpc.vpcs | length > 0
