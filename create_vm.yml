@@ -8,8 +8,8 @@
   tasks:
   - name: Check if the VM is already provisioned
     amazon.aws.ec2_instance_info:
-      aws_access_key: "{{ access_key }}"
-      aws_secret_access_key: "{{ aws_secret_access_key }}"
+      # aws_access_key: "{{ access_key }}"
+      # aws_secret_access_key: "{{ aws_secret_access_key }}"
       filters:
         "tag:Name": "{{ vm_name }}"
         instance-state-name:
@@ -40,8 +40,8 @@
     block:
       - name: Query vpc
         amazon.aws.ec2_vpc_net_info:
-          aws_access_key: "{{ access_key }}"
-          aws_secret_access_key: "{{ aws_secret_access_key }}"
+          # aws_access_key: "{{ access_key }}"
+          # aws_secret_access_key: "{{ aws_secret_access_key }}"
           filters:
             "tag:Name": "{{ VPC }}"
         register: existing_vpc
@@ -62,8 +62,8 @@
 
       - name: Get Security Group Info
         amazon.aws.ec2_security_group_info:
-          aws_access_key: "{{ access_key }}"
-          aws_secret_access_key: "{{ aws_secret_access_key }}"
+          # aws_access_key: "{{ access_key }}"
+          # aws_secret_access_key: "{{ aws_secret_access_key }}"
           filters:
             vpc-id: "{{ vpc_id }}"
         register: aws_security_group
@@ -82,8 +82,8 @@
 
       - name: Get subnet info
         amazon.aws.ec2_vpc_subnet_info:
-          aws_access_key: "{{ access_key }}"
-          aws_secret_access_key: "{{ aws_secret_access_key }}"
+          # aws_access_key: "{{ access_key }}"
+          # aws_secret_access_key: "{{ aws_secret_access_key }}"
           region: "{{ aws_region }}"
           filters:
             "tag:Name": "{{ Subnet }}"
@@ -104,8 +104,8 @@
 
       - name: Find ami
         amazon.aws.ec2_ami_info:
-          aws_access_key: "{{ access_key }}"
-          aws_secret_access_key: "{{ aws_secret_access_key }}"
+          # aws_access_key: "{{ access_key }}"
+          # aws_secret_access_key: "{{ aws_secret_access_key }}"
           region: "{{ aws_region }}"
           owners: "{{ aws_image_owners | default(omit) }}"
           filters:
@@ -121,8 +121,8 @@
 
       - name: Create instance
         amazon.aws.ec2_instance:
-          aws_access_key: "{{ access_key }}"
-          aws_secret_access_key: "{{ aws_secret_access_key }}"
+          # aws_access_key: "{{ access_key }}"
+          # aws_secret_access_key: "{{ aws_secret_access_key }}"
           vpc_subnet_id: "{{ aws_subnet_id }}"
           filters:
             "tag:Name": "{{ vm_name }}"
