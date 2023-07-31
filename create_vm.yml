@@ -86,7 +86,7 @@
           aws_secret_access_key: "{{ aws_secret_access_key }}"
           region: "{{ aws_region }}"
           filters:
-            "tag:Name": "{{ aws_vpc_subnet_name }}"
+            "tag:Name": "{{ Subnet }}"
         register: aws_subnet
         when: aws_subnet_id is not defined
 
@@ -94,6 +94,13 @@
         ansible.builtin.set_fact:
           aws_subnet_id: "{{ aws_subnet.subnets | map(attribute='id') | list | last }}"
         when: aws_subnet_id is not defined
+
+      - name: Debug subnet ID
+        ansible.builtin.debug:
+          msg:
+            - " aws subnet id: {{ aws_subnet_id }}"
+        when: aws_subnet_id is defined
+
 
       - name: Find ami
         amazon.aws.ec2_ami_info:

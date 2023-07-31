@@ -6,7 +6,7 @@ InternetGateway: "VM-internet-gateway"
 Subnet: "{{ VPC }} - Subnet"
 CIDR: "10.0.0.0/24"
 aws_region: us-east-2
-aws_keypair_name: SAPKey
+aws_keypair_name: jag-aaponaws-july2023
 aws_instance_size: t2.2xlarge
 tenancy: default
 aws_securitygroup_name: private-network-sg
