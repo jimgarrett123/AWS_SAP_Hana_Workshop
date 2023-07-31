@@ -138,7 +138,6 @@
             Name: "{{ vm_name }}"
             Hostname: "{{ hostname }}"
           wait: "{{ aws_ec2_wait }}"
-          vpc_subnet_id: "{{ aws_subnet_id }}"
         register: aws_ec2_instance
 
       - name: Output the IP of new VM
