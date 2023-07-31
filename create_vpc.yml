@@ -74,7 +74,7 @@
       vpc_id: "{{ vpc_id }}"
       cidr: "{{ CIDR }}"
       tags:
-        Name: "{{ aws_vpc_subnet_name }}"
+        Name: "{{ Subnet }}"
     register: vpc_subnet
     when: vpc_id is defined and vpc_subnet.subnets | length == 0
     tags: subnet
