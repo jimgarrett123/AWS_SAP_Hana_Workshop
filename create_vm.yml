@@ -3,13 +3,11 @@
   hosts: localhost
 
   vars_files:
-    - external_vars.yml
+  - external_vars.yml
 
   tasks:
   - name: Check if the VM is already provisioned
     amazon.aws.ec2_instance_info:
-      # aws_access_key: "{{ access_key }}"
-      # aws_secret_access_key: "{{ aws_secret_access_key }}"
       filters:
         "tag:Name": "{{ vm_name }}"
         instance-state-name:
