@@ -9,7 +9,7 @@
     tags: passwd
 
   - name: Subscription-manager register
-    community.general.redhat_subscription:
+    redhat_subscription:
       state: present
       username: "{{ username }}"
       password: "{{ password }}"
@@ -30,7 +30,7 @@
     tags: rhsm_manage
 
   - name: Subscription-manager repos
-    community.general.rhsm_repository:
+    rhsm_repository:
       name:
         - rhel-8-for-x86_64-baseos-e4s-rpms
         - rhel-8-for-x86_64-appstream-e4s-rpms
