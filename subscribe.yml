@@ -1,6 +1,6 @@
 ---
 - name: Subscription Manager Actions
-  hosts: aws_servers
+  hosts: all
 
   tasks:
   - name: Run command line script
