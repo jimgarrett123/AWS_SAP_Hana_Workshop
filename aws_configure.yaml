@@ -1,0 +1,15 @@
+---
+- name: Configure AWS environment
+  hosts: localhost
+  tasks:
+  - name: Configure AWS Access Key id
+    ansible.builtin.command: aws configure set aws_access_key_id {{ aws_access_key }}
+
+  - name: Configure AWS Secret Access Key id
+    ansible.builtin.command: aws configure set aws_secret_access_key {{ aws_secret_access_key }}
+
+  - name: Configure AWS Region
+    ansible.builtin.command: aws configure set region {{ region }}
+
+  - name: Configure AWS Output
+    ansible.builtin.command: aws configure set output {{ output }}

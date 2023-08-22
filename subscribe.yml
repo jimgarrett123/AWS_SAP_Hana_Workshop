@@ -1,6 +1,12 @@
 ---
 - name: Subscription Manager Actions
   hosts: all
+  vars_prompt:
+    - name: username
+      prompt: What is your username?
+      private: false
+    - name: password
+      prompt: What is your password?
 
   tasks:
   - name: Run command line script
