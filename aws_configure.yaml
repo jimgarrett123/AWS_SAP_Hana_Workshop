@@ -1,6 +1,7 @@
 ---
 - name: Configure AWS environment
-  hosts: localhost
+  hosts: aws_servers
+
   tasks:
   - name: Configure AWS Access Key id
     ansible.builtin.command: aws configure set aws_access_key_id {{ aws_access_key }}

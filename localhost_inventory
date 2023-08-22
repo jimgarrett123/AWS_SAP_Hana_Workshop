@@ -1,0 +1,5 @@
+[VMHana1]
+localhost
+
+[aws_servers:children]
+VMHana1
