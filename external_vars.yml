@@ -1,5 +1,5 @@
-primary_vm: VMHana3
-secondary_vm: VMHana4
+primary_vm: VMHana1
+secondary_vm: VMHana2
 
 VPC: "TestVPC"
 InternetGateway: "VM-internet-gateway"
@@ -15,7 +15,7 @@ aws_ec2_wait: true
 aws_userdata_template: default
 # Tag Defaults
 hostname: tbd
-vm_name: VMHana3
+vm_name: VMHana1
 vm_deployment: default
 vm_environment: default
 vm_owner: ansible

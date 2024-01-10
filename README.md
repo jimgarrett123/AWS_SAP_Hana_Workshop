@@ -68,8 +68,8 @@ Prior to running any of these playbooks someone must first perform the following
     The Ansible playbooks are designed to use environment variables when performing the AWS Infrastructure steps.  Use your favorite editor to create the following environment variables in a yaml file:
 
     ```
-    primary_vm: VMHana3
-    secondary_vm: VMHana4
+    primary_vm: VMHana1
+    secondary_vm: VMHana2
 
     VPC: "TestVPC"
     InternetGateway: "VM-internet-gateway"
@@ -86,7 +86,7 @@ Prior to running any of these playbooks someone must first perform the following
 
     # Tag Defaults
     hostname: tbd
-    vm_name: VMHana3
+    vm_name: VMHana1
     vm_deployment: default
     vm_environment: default
     vm_owner: ansible
